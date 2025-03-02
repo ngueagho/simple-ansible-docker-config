@@ -1,0 +1,40 @@
+---
+# tasks file for roles/network_role
+# get network interfaces 
+- name: Get network interfaces
+  ansible.builtin.command:
+    cmd: |
+      ip route show | awk '{print $3 "  :  "  $1}'
+  register: interfaces_output
+
+- name: Show interfaces
+  debug:
+    msg: "{{ interfaces_output.stdout }}"
+
+
+
+# ccopy dockerconfig file to change the listened interface 
+- name: docker-service file
+  ansible.builtin.copy:
+    src: ./docker.service
+    dest: /lib/systemd/system/docker.service
+
+- name: reload systemd daemon
+  ansible.builtin.command:
+    cmd: sudo systemctl daemon-reload
+
+- name: restart docker service
+  ansible.builtin.command:
+    cmd: sudo systemctl restart docker
+
+
+#  Rgister the display infos of the connection
+
+- name: register the curl output command in a variable 
+  ansible.builtin.command:
+    cmd: curl http://127.0.0.1:2375/info
+  register: curl_command_output
+
+- name: Show output
+  debug:
+    msg: "{{ curl_command_output.stdout }}"

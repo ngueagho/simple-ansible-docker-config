@@ -1,0 +1,35 @@
+---
+# tasks file for roles/docker_role
+#  Ajout de la clé GPG de Docker
+- name: Add Docker GPG apt Key
+  shell: |
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | tee /etc/apt/keyrings/docker.asc
+  args:
+    creates: /etc/apt/keyrings/docker.asc
+
+# Ajout du dépôt officiel Docker
+- name: Add Docker Repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu focal stable"
+    state: present
+    filename: docker
+
+#  Mise à jour du cache APT
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+#  Installation de Docker Engine
+- name: Install Docker Engine
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+
+#  Installation du module Docker pour Python
+- name: Install Docker Module for Python
+  pip:
+    name: docker

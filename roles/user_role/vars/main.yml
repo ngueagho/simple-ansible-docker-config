@@ -1,0 +1,4 @@
+---
+# vars file for user_role
+admin_group: "admins"
+default_user_password: "MonMotDePasseSuperSecret"
